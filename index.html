@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PixelMatte | High-Fidelity Image Matting with Pixel-Space Diffusion Transformers</title>
+  <meta name="description" content="PixelMatte adapts pretrained pixel-space diffusion transformers to trimap image matting and predicts the alpha matte in one forward pass, without a VAE.">
+  <meta property="og:title" content="PixelMatte: High-Fidelity Image Matting with Pixel-Space Diffusion Transformers">
+  <meta property="og:description" content="One-step trimap matting directly in pixel space with pretrained pixel diffusion transformers.">
+  <meta property="og:image" content="static/images/teaser.jpg">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="main">
+
+  <header id="info-banner">
+    <div class="background-filter py-5">
+      <div class="wrapper m-auto px-4 py-4">
+        <h1><span class="brand">PixelMatte</span>: High-Fidelity Image Matting with Pixel-Space Diffusion Transformers</h1>
+
+        <div class="authors mt-4">
+          Baihan Yang<sup>1</sup><span class="sep">&middot;</span>
+          Xin Lin<sup>1</sup><span class="sep">&middot;</span>
+          Yufan Wei<sup>1</sup><span class="sep">&middot;</span>
+          Baiang Li<sup>2</sup><span class="sep">&middot;</span>
+          Yuheng Liu<sup>3</sup><span class="sep">&middot;</span>
+          Juanxi Tian<sup>4</sup><span class="sep">&middot;</span>
+          Xiaohui Xie<sup>3</sup><span class="sep">&middot;</span>
+          Truong Nguyen<sup>1</sup>
+        </div>
+        <div class="affiliations">
+          <span><sup>1</sup>UC San Diego</span>
+          <span><sup>2</sup>Princeton University</span>
+          <span><sup>3</sup>UC Irvine</span>
+          <span><sup>4</sup>Nanyang Technological University</span>
+        </div>
+
+        <div class="links mt-4">
+          <span class="pill" title="The arXiv link will be added here">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg>
+            Paper (arXiv, coming soon)
+          </span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrapper m-auto px-4 mt-5">
+
+    <section class="section">
+      <figure class="figure mt-0">
+        <img src="static/images/teaser.jpg" alt="Inputs with trimaps, PixelMatte alpha mattes and zoomed regions for four images, next to a radar chart of errors on four test sets" width="2200" height="810">
+        <figcaption>PixelMatte performs generative trimap matting in one step, directly in pixel space. Left: the inputs with the trimap inset, our predicted mattes, and zoomed regions. Right: SAD, Grad and Conn on four test sets against published methods; each axis is the lowest plotted error divided by the method's error, so outer is lower.</figcaption>
+      </figure>
+    </section>
+
+    <section class="section">
+      <h2>Abstract</h2>
+      <p class="abstract">Diffusion models have shown strong potential for image matting by transferring generative priors learned from large-scale pretraining. However, existing approaches largely rely on latent diffusion models, whose compressed representations and VAE-based reconstruction introduce a mismatch with the high-frequency precision required for matting. We present PixelMatte, a framework that adapts pretrained pixel-space diffusion transformers for high-fidelity image matting. We show that strong image-conditioned matting capabilities can be acquired even from a pure text-to-image model without paired image-to-image pretraining. Our approach reuses the backbone's native patch embedding to jointly process the input image, trimap, and noisy alpha matte as spatially aligned tokens, enabling direct pixel-space prediction without additional condition encoders or adapters. With pixel-accurate synthetic supervision and real-image fine-tuning, PixelMatte predicts alpha mattes in a single forward pass. Two lightweight calibration modules, LayerShift and High-Pass Refiner, further improve regional opacity accuracy and boundary fidelity. Experiments across four benchmarks and two distinct pixel diffusion backbones demonstrate substantial improvements over existing methods, reducing SAD and gradient errors by 24&ndash;44% relative to RenderMatte on P3M-500-NP and AM-2K, while achieving competitive performance on AIM-500 and RenderMatte-2K. These results demonstrate the effectiveness of pixel-space generative priors for precision-sensitive image matting.</p>
+    </section>
+
+    <section class="section">
+      <h2>Method</h2>
+      <p>Latent diffusion matting predicts the matte as a compressed code between a frozen VAE encoder and a frozen VAE decoder. PixelMatte removes both: a pretrained pixel-space diffusion transformer reads the image, the trimap and the noisy matte as pixel tokens and writes the alpha matte directly.</p>
+      <ul class="key-points">
+        <li><strong>Spatially aligned conditioning.</strong> The image, the trimap and the noisy matte go through the backbone's own patch embedding and share one spatial grid, so no condition encoder or adapter is added.</li>
+        <li><strong>One-step prediction.</strong> After fine-tuning on pixel-accurate synthetic composites and real photographs, the model predicts the matte in a single forward pass.</li>
+        <li><strong>LayerShift.</strong> One learned vector per transformer layer, added to the tokens of the unknown region while the backbone stays frozen, calibrates regional opacity.</li>
+        <li><strong>High-Pass Refiner.</strong> A small residual network whose output passes through a high-pass operator sharpens boundary transitions of the predicted matte.</li>
+      </ul>
+      <figure class="figure">
+        <img src="static/images/method.png" alt="Diagram comparing latent diffusion matting with a VAE encoder and decoder to PixelMatte, which embeds the noisy matte, image and trimap as aligned pixel tokens" width="2200" height="949">
+        <figcaption>Overview of PixelMatte. (a) Latent diffusion matting predicts the matte as a latent code between a frozen VAE encoder and a frozen VAE decoder. (b) PixelMatte embeds the noisy matte, the image and the trimap as pixel tokens on a shared grid and predicts the matte in a single forward pass without a VAE. LayerShift acts inside the backbone, and the High-Pass Refiner refines the predicted matte.</figcaption>
+      </figure>
+    </section>
+
+    <section class="section">
+      <h2>Results</h2>
+      <p>We evaluate two backbones, PRX-7B and HiDream-O1-Image 8B, on P3M-500-NP, AM-2K, AIM-500 and RenderMatte-2K with their released trimaps. Inference is a single forward pass without test-time augmentation.</p>
+      <div class="table-scroll">
+        <table class="results">
+          <thead>
+            <tr>
+              <th rowspan="2">Method</th>
+              <th colspan="2" class="grp">P3M-500-NP</th>
+              <th colspan="2" class="grp">AM-2K</th>
+              <th colspan="2" class="grp">AIM-500</th>
+              <th colspan="2" class="grp">RM-2K</th>
+            </tr>
+            <tr>
+              <th class="grp">SAD</th><th>Grad</th>
+              <th class="grp">SAD</th><th>Grad</th>
+              <th class="grp">SAD</th><th>Grad</th>
+              <th class="grp">SAD</th><th>Grad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>ViTMatte</td><td class="grp">7.1</td><td>10.6</td><td class="grp">7.7</td><td>6.2</td><td class="grp">17.8</td><td>13.7</td><td class="grp">4.5</td><td>4.8</td></tr>
+            <tr><td>DiffMatte</td><td class="grp">6.6</td><td>10.0</td><td class="grp">6.8</td><td>5.7</td><td class="grp">17.2</td><td>13.5</td><td class="grp">4.3</td><td>4.4</td></tr>
+            <tr><td>RenderMatte</td><td class="grp">6.2</td><td>8.2</td><td class="grp">6.5</td><td>5.5</td><td class="grp">13.6</td><td>11.2</td><td class="grp">3.6</td><td>3.0</td></tr>
+            <tr class="ours rule"><td>PixelMatte (PRX-7B)</td><td class="grp">4.7</td><td>5.6</td><td class="grp">4.6</td><td>3.4</td><td class="grp">12.7</td><td>8.5</td><td class="grp">3.5</td><td>3.2</td></tr>
+            <tr class="ours"><td>PixelMatte (HiDream-8B)</td><td class="grp"><strong>4.3</strong></td><td><strong>4.6</strong></td><td class="grp"><strong>4.4</strong></td><td><strong>3.1</strong></td><td class="grp"><strong>12.6</strong></td><td><strong>7.7</strong></td><td class="grp"><strong>3.3</strong></td><td><strong>2.8</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-note">SAD and Grad, lower is better; best in bold. Results of prior methods are the published numbers collected by RenderMatte. The paper reports all nine compared methods with MSE and Conn.</p>
+
+      <figure class="figure">
+        <img src="static/images/qualitative.jpg" alt="Rows of zoomed regions comparing the input, trimap, ViTMatte-B, RenderMatte, PixelMatte and the ground-truth alpha matte" width="2000" height="2267" loading="lazy">
+        <figcaption>Qualitative comparison on P3M-500-NP, AM-2K, AIM-500 and RM-2K. From left to right: input image, trimap, ViTMatte-B, RenderMatte, PixelMatte and the ground-truth alpha matte. Each row shows a zoomed region.</figcaption>
+      </figure>
+    </section>
+
+    <section class="section">
+      <h2>Opacity and Boundary Calibration</h2>
+      <p>The two calibration modules act on different errors of the one-step prediction. LayerShift adjusts opacity over extended regions, and the High-Pass Refiner makes localized corrections along object contours.</p>
+      <figure class="figure">
+        <img src="static/images/calibration.jpg" alt="Alpha mattes before and after each calibration module with error maps and correction maps" width="2200" height="790" loading="lazy">
+        <figcaption>Each row compares the alpha mattes before and after a calibration module against the ground truth. Error maps show prediction minus ground truth, and correction maps show the matte after minus before, on a shared color scale. LayerShift adjusts regional opacity levels (top), whereas the High-Pass Refiner concentrates its corrections around fine boundaries (middle and bottom).</figcaption>
+      </figure>
+    </section>
+
+    <section class="section">
+      <h2>BibTeX</h2>
+      <div class="bibtex">
+        <button type="button" id="copy-bib">Copy</button>
+<pre id="bib">@article{yang2026pixelmatte,
+  title   = {High-Fidelity Image Matting with Pixel-Space Diffusion Transformers},
+  author  = {Yang, Baihan and Lin, Xin and Wei, Yufan and Li, Baiang and Liu, Yuheng and Tian, Juanxi and Xie, Xiaohui and Nguyen, Truong},
+  journal = {arXiv preprint},
+  year    = {2026}
+}</pre>
+      </div>
+    </section>
+
+    <div class="footer py-3">
+      <div>PixelMatte project page</div>
+      <div>Last updated: 2026-11-24</div>
+    </div>
+  </main>
+
+  <div class="modal fade" id="lightbox" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content">
+        <img id="lightbox-img" src="" alt="">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  (function () {
+    var modalEl = document.getElementById('lightbox');
+    var img = document.getElementById('lightbox-img');
+    var modal = null;
+    document.querySelectorAll('.figure img').forEach(function (el) {
+      el.addEventListener('click', function () {
+        if (!window.bootstrap) { window.open(el.src, '_blank'); return; }
+        modal = modal || new bootstrap.Modal(modalEl);
+        img.src = el.src; img.alt = el.alt; modal.show();
+      });
+    });
+    img.addEventListener('click', function () { if (modal) modal.hide(); });
+
+    var btn = document.getElementById('copy-bib');
+    btn.addEventListener('click', function () {
+      var text = document.getElementById('bib').innerText;
+      var done = function () { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy'; }, 1500); };
+      if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(done, function () {}); }
+    });
+  })();
+</script>
+</body>
+</html>
