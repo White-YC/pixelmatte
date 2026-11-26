@@ -12,7 +12,7 @@ Baihan Yang, Xin Lin, Yufan Wei, Baiang Li, Yuheng Liu, Juanxi Tian, Xiaohui Xie
 
 **Code will be released soon.** Star the repository to be notified.
 
-The project page lives on the [`page`](https://github.com/White-YC/pixelmatte/tree/page) branch.
+The project page lives on the [`gh-pages`](https://github.com/White-YC/pixelmatte/tree/gh-pages) branch.
 
 ## Star History
 
