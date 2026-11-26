@@ -193,6 +193,8 @@ table.results .grp { border-left: 1px solid var(--line); }
 }
 
 .footer .views img { height: 18px; width: auto; display: block; }
+.footer a { text-decoration: none; }
+.footer a:hover { text-decoration: underline; color: #666; }
 
 @media (max-width: 576px) {
   #info-banner h1 { font-size: 1.45rem; }
