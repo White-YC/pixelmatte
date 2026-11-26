@@ -102,6 +102,7 @@ a:hover { color: #999; }
 
 .links span.pill { color: #555; cursor: default; }
 .links svg { width: 18px; height: 18px; }
+.links .link-icon { height: 20px; width: auto; }
 
 /* content */
 .section { margin-bottom: 3rem; }
