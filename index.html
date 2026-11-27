@@ -63,7 +63,7 @@
         <div class="carousel-inner">
           <div class="carousel-item active">
             <div class="showcase-frame">
-              <video id="showcase-video" src="static/videos/pixelmatte.mp4" poster="static/videos/pixelmatte_poster.jpg" autoplay muted loop playsinline preload="metadata"></video>
+              <video id="showcase-video" src="static/videos/pixelmatte.mp4" poster="static/videos/pixelmatte_poster.jpg" width="2200" height="810" autoplay muted loop playsinline preload="metadata"></video>
             </div>
           </div>
           <div class="carousel-item">
@@ -73,16 +73,11 @@
           </div>
         </div>
       </div>
-      <div class="showcase-tabs">
-        <button type="button" class="arrow" data-bs-target="#showcase" data-bs-slide="prev" aria-label="Previous">&#8249;</button>
-        <button type="button" class="tab active" data-bs-target="#showcase" data-bs-slide-to="0" aria-current="true">Video</button>
-        <button type="button" class="tab" data-bs-target="#showcase" data-bs-slide-to="1">Figure</button>
-        <button type="button" class="arrow" data-bs-target="#showcase" data-bs-slide="next" aria-label="Next">&#8250;</button>
+      <div class="showcase-nav">
+        <button type="button" data-bs-target="#showcase" data-bs-slide="prev" aria-label="Previous">&#8249;</button>
+        <button type="button" data-bs-target="#showcase" data-bs-slide="next" aria-label="Next">&#8250;</button>
       </div>
-      <div class="showcase-captions">
-        <p class="active">Each photo is wiped to the alpha matte that PixelMatte predicts from it and its trimap in a single step.</p>
-        <p>PixelMatte performs generative trimap matting in one step, directly in pixel space. Left: the inputs with the trimap inset, our predicted mattes, and zoomed regions. Right: SAD, Grad and Conn on four test sets against published methods; each axis is the lowest plotted error divided by the method's error, so outer is lower.</p>
-      </div>
+      <p class="showcase-caption">PixelMatte performs generative trimap matting in one step, directly in pixel space. Left: the inputs with the trimap inset, our predicted mattes, and zoomed regions. Right: SAD, Grad and Conn on four test sets against published methods; each axis is the lowest plotted error divided by the method's error, so outer is lower.</p>
     </section>
 
     <section class="section">
@@ -198,14 +193,10 @@
     });
     img.addEventListener('click', function () { if (modal) modal.hide(); });
 
-    // Showcase carousel: the tabs and the caption follow the slide; the video only plays while its slide is shown.
+    // Showcase carousel: the video only plays while its slide is shown.
     var show = document.getElementById('showcase');
     var video = document.getElementById('showcase-video');
-    var tabs = document.querySelectorAll('.showcase-tabs button.tab');
-    var caps = document.querySelectorAll('.showcase-captions p');
     show.addEventListener('slide.bs.carousel', function (e) {
-      tabs.forEach(function (t, i) { t.classList.toggle('active', i === e.to); });
-      caps.forEach(function (c, i) { c.classList.toggle('active', i === e.to); });
       if (e.to === 0) { var p = video.play(); if (p && p.catch) { p.catch(function () {}); } } else { video.pause(); }
     });
 
