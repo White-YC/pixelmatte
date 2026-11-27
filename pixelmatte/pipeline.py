@@ -28,12 +28,17 @@ class PixelMattePipeline:
         self.prompt_embeds = None
 
     @classmethod
-    def from_pretrained(cls, path: str, device="cuda", revision: str = None, token=None):
-        """`path` is a local folder with config.json and model.safetensors, or the name of a Hugging Face model repository."""
+    def from_pretrained(cls, path: str, subfolder: str = None, device="cuda", revision: str = None, token=None):
+        """`path` is a local folder or the name of a Hugging Face model repository; `subfolder` selects a checkpoint inside it,
+        for example "HiDream-8B". A checkpoint is a folder with config.json and model.safetensors."""
         folder = Path(path)
         if not folder.is_dir():
             from huggingface_hub import snapshot_download
-            folder = Path(snapshot_download(path, revision=revision, token=token, allow_patterns=["config.json", "model.safetensors"]))
+            prefix = f"{subfolder}/" if subfolder else ""
+            folder = Path(snapshot_download(path, revision=revision, token=token,
+                                            allow_patterns=[prefix + "config.json", prefix + "model.safetensors"]))
+        if subfolder:
+            folder = folder / subfolder
         config = json.loads((folder / "config.json").read_text())
         with safe_open(str(folder / "model.safetensors"), "pt", device=str(device)) as f:
             state = {k: f.get_tensor(k) for k in f.keys()}

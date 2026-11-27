@@ -1,7 +1,7 @@
 """Run PixelMatte on one image or on a folder of images.
 
-    python infer.py --model checkpoints/PixelMatte-HiDream-8B --image photo.jpg --trimap trimap.png --output alpha.png
-    python infer.py --model checkpoints/PixelMatte-HiDream-8B --image images/ --trimap trimaps/ --output mattes/
+    python infer.py --model WhiteYC/PixelMatte --subfolder HiDream-8B --image photo.jpg --trimap trimap.png --output alpha.png
+    python infer.py --model WhiteYC/PixelMatte --subfolder HiDream-8B --image images/ --trimap trimaps/ --output mattes/
 
 In folder mode every image needs a trimap with the same file name (any image extension). The matte is written as a 16-bit PNG;
 --cutout additionally writes the image with the matte as its alpha channel.
@@ -32,7 +32,8 @@ def find_pairs(image: Path, trimap: Path, output: Path):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--model", required=True, help="checkpoint folder or Hugging Face repository")
+    ap.add_argument("--model", required=True, help="Hugging Face repository or local folder")
+    ap.add_argument("--subfolder", default=None, help="checkpoint inside the repository or folder: HiDream-8B or PRX-7B")
     ap.add_argument("--image", required=True, type=Path, help="image file or folder")
     ap.add_argument("--trimap", required=True, type=Path, help="trimap file or folder (0 background, 128 unknown, 255 foreground)")
     ap.add_argument("--output", required=True, type=Path, help="output file or folder")
@@ -44,7 +45,7 @@ def main():
     ap.add_argument("--device", default="cuda")
     args = ap.parse_args()
 
-    pipe = PixelMattePipeline.from_pretrained(args.model, device=args.device)
+    pipe = PixelMattePipeline.from_pretrained(args.model, args.subfolder, device=args.device)
     pairs = find_pairs(args.image, args.trimap, args.output)
     if args.image.is_dir():
         args.output.mkdir(parents=True, exist_ok=True)

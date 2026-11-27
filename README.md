@@ -30,13 +30,15 @@ unknown region, and the **High-Pass Refiner**, a small network that corrects fin
 
 ## Models
 
+Both checkpoints are in one Hugging Face repository, [WhiteYC/PixelMatte](https://huggingface.co/WhiteYC/PixelMatte):
+
 | Model | Backbone | Network input | Checkpoint |
 |---|---|---|---|
-| PixelMatte (HiDream-8B) | [HiDream-O1-Image](https://huggingface.co/HiDream-ai/HiDream-O1-Image) | short side 2048 | [WhiteYC/PixelMatte-HiDream-8B](https://huggingface.co/WhiteYC/PixelMatte-HiDream-8B) |
-| PixelMatte (PRX-7B) | [PRX](https://huggingface.co/Photoroom/prxpixel-t2i) | short side 1024 | [WhiteYC/PixelMatte-PRX-7B](https://huggingface.co/WhiteYC/PixelMatte-PRX-7B) |
+| PixelMatte (HiDream-8B) | [HiDream-O1-Image](https://huggingface.co/HiDream-ai/HiDream-O1-Image) | short side 2048 | [`HiDream-8B`](https://huggingface.co/WhiteYC/PixelMatte/tree/main/HiDream-8B) |
+| PixelMatte (PRX-7B) | [PRX](https://huggingface.co/Photoroom/prxpixel-t2i) | short side 1024 | [`PRX-7B`](https://huggingface.co/WhiteYC/PixelMatte/tree/main/PRX-7B) |
 
 Each checkpoint is one folder with `config.json` and `model.safetensors` and contains the backbone, LayerShift and the
-High-Pass Refiner. No text encoder or VAE is needed.
+High-Pass Refiner. No text encoder or VAE is needed. The code downloads the checkpoint it is asked for on first use.
 
 ## Installation
 
@@ -53,10 +55,10 @@ Command line:
 
 ```bash
 # one image
-python infer.py --model WhiteYC/PixelMatte-HiDream-8B --image photo.jpg --trimap trimap.png --output alpha.png
+python infer.py --model WhiteYC/PixelMatte --subfolder HiDream-8B --image photo.jpg --trimap trimap.png --output alpha.png
 
 # a folder of images and a folder of trimaps with the same file names
-python infer.py --model WhiteYC/PixelMatte-HiDream-8B --image images/ --trimap trimaps/ --output mattes/
+python infer.py --model WhiteYC/PixelMatte --subfolder HiDream-8B --image images/ --trimap trimaps/ --output mattes/
 ```
 
 Python:
@@ -65,7 +67,7 @@ Python:
 from PIL import Image
 from pixelmatte import PixelMattePipeline
 
-pipe = PixelMattePipeline.from_pretrained("WhiteYC/PixelMatte-HiDream-8B")
+pipe = PixelMattePipeline.from_pretrained("WhiteYC/PixelMatte", subfolder="HiDream-8B")
 alpha = pipe(Image.open("photo.jpg"), Image.open("trimap.png"))      # float32 array [H, W] in [0, 1]
 ```
 
@@ -89,26 +91,26 @@ As in the paper, each test set is predicted twice, with the noise seeds 42 and 4
 (adjust the paths to where you put the sets):
 
 ```bash
-MODEL=WhiteYC/PixelMatte-HiDream-8B
+MODEL=HiDream-8B
 
 # P3M-500-NP
-for SEED in 42 43; do python infer.py --model $MODEL --seed $SEED --image P3M-10k/validation/P3M-500-NP/original_image --trimap P3M-10k/validation/P3M-500-NP/trimap --output results/p3m_500_np/seed$SEED; done
+for SEED in 42 43; do python infer.py --model WhiteYC/PixelMatte --subfolder $MODEL --seed $SEED --image P3M-10k/validation/P3M-500-NP/original_image --trimap P3M-10k/validation/P3M-500-NP/trimap --output results/p3m_500_np/seed$SEED; done
 python eval.py --pred results/p3m_500_np/seed42 results/p3m_500_np/seed43 --alpha P3M-10k/validation/P3M-500-NP/mask --trimap P3M-10k/validation/P3M-500-NP/trimap
 
 # AM-2K
-for SEED in 42 43; do python infer.py --model $MODEL --seed $SEED --image AM-2k/validation/original --trimap AM-2k/validation/trimap --output results/am_2k/seed$SEED; done
+for SEED in 42 43; do python infer.py --model WhiteYC/PixelMatte --subfolder $MODEL --seed $SEED --image AM-2k/validation/original --trimap AM-2k/validation/trimap --output results/am_2k/seed$SEED; done
 python eval.py --pred results/am_2k/seed42 results/am_2k/seed43 --alpha AM-2k/validation/mask --trimap AM-2k/validation/trimap
 
 # AIM-500
-for SEED in 42 43; do python infer.py --model $MODEL --seed $SEED --image AIM-500/original --trimap AIM-500/trimap --output results/aim_500/seed$SEED; done
+for SEED in 42 43; do python infer.py --model WhiteYC/PixelMatte --subfolder $MODEL --seed $SEED --image AIM-500/original --trimap AIM-500/trimap --output results/aim_500/seed$SEED; done
 python eval.py --pred results/aim_500/seed42 results/aim_500/seed43 --alpha AIM-500/mask --trimap AIM-500/trimap
 
 # RM-2K
-for SEED in 42 43; do python infer.py --model $MODEL --seed $SEED --image RenderMatte-dataset/RenderMatte-2k/original --trimap RenderMatte-dataset/RenderMatte-2k/trimap --output results/rm_2k/seed$SEED; done
+for SEED in 42 43; do python infer.py --model WhiteYC/PixelMatte --subfolder $MODEL --seed $SEED --image RenderMatte-dataset/RenderMatte-2k/original --trimap RenderMatte-dataset/RenderMatte-2k/trimap --output results/rm_2k/seed$SEED; done
 python eval.py --pred results/rm_2k/seed42 results/rm_2k/seed43 --alpha RenderMatte-dataset/RenderMatte-2k/mask --trimap RenderMatte-dataset/RenderMatte-2k/trimap
 ```
 
-Set `MODEL=WhiteYC/PixelMatte-PRX-7B` for the PRX model. `eval.py` prints the score of each run and their mean. All four
+Set `MODEL=PRX-7B` for the PRX model. `eval.py` prints the score of each run and their mean. All four
 metrics are computed over the whole image; `eval.py` documents their definitions.
 
 ## Star History
