@@ -59,6 +59,7 @@
   <main class="wrapper m-auto px-4 mt-5">
 
     <section class="section">
+      <div class="showcase-wrap">
       <div id="showcase" class="carousel slide carousel-dark showcase" data-bs-interval="false" data-bs-touch="true">
         <div class="carousel-inner">
           <div class="carousel-item active">
@@ -73,9 +74,8 @@
           </div>
         </div>
       </div>
-      <div class="showcase-nav">
-        <button type="button" data-bs-target="#showcase" data-bs-slide="prev" aria-label="Previous">&#8249;</button>
-        <button type="button" data-bs-target="#showcase" data-bs-slide="next" aria-label="Next">&#8250;</button>
+        <button type="button" class="showcase-arrow prev" data-bs-target="#showcase" data-bs-slide="prev" aria-label="Previous">&#8249;</button>
+        <button type="button" class="showcase-arrow next" data-bs-target="#showcase" data-bs-slide="next" aria-label="Next">&#8250;</button>
       </div>
       <p class="showcase-caption">PixelMatte performs generative trimap matting in one step, directly in pixel space. Left: the inputs with the trimap inset, our predicted mattes, and zoomed regions. Right: SAD, Grad and Conn on four test sets against published methods; each axis is the lowest plotted error divided by the method's error, so outer is lower.</p>
     </section>
