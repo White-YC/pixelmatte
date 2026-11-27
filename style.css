@@ -130,6 +130,35 @@ a:hover { color: #999; }
 .key-points { padding-left: 1.2rem; }
 .key-points li { margin-bottom: 0.4rem; }
 
+/* showcase carousel: video first, then the overview figure */
+.showcase { border-radius: 8px; overflow: hidden; background: #000; }
+.showcase-frame {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+}
+.showcase-frame video { width: 100%; height: 100%; object-fit: contain; background: #000; display: block; }
+.showcase-frame img { width: 100%; height: auto; border-radius: 0; }
+.showcase-tabs { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 0.75rem; }
+.showcase-tabs button {
+  border: none;
+  border-radius: 20px;
+  background: var(--pill);
+  color: #555;
+  font-size: 0.85rem;
+  padding: 3px 14px;
+}
+.showcase-tabs button.active { background: var(--ink); color: #ffffff; }
+.showcase-tabs button.arrow { width: 28px; height: 28px; padding: 0; border-radius: 50%; font-size: 1.1rem; line-height: 1; }
+.showcase-tabs button:hover { color: var(--ink); }
+.showcase-tabs button.active:hover { color: #ffffff; }
+.showcase-captions { font-size: 0.875rem; color: var(--muted); margin-top: 0.6rem; min-height: 4.2em; }
+.showcase-captions p { display: none; margin: 0; }
+.showcase-captions p.active { display: block; }
+
 /* results table */
 .table-scroll { overflow-x: auto; }
 table.results {
