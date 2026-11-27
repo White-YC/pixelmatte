@@ -15,6 +15,19 @@ PixelMatte predicts an alpha matte from an image and a trimap with a pixel-space
 evaluation and without a VAE. Two modules complete the model: **LayerShift**, a learned per-layer shift of the tokens in the
 unknown region, and the **High-Pass Refiner**, a small network that corrects fine detail at full resolution.
 
+## News
+
+- **2026-11-27**: The inference and evaluation code, the two checkpoints and the
+  [online demo](https://huggingface.co/spaces/WhiteYC/PixelMatte) are released.
+
+## Release Plan
+
+- [x] Inference code
+- [x] Evaluation code
+- [x] Checkpoints (HiDream-8B and PRX-7B)
+- [x] Online demo
+- [ ] Training code
+
 ## Models
 
 | Model | Backbone | Network input | Checkpoint |
