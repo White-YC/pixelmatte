@@ -1,6 +1,4 @@
-# PixelMatte
-
-**High-Fidelity Image Matting with Pixel-Space Diffusion Transformers**
+## High-Fidelity Image Matting with Pixel-Space Diffusion Transformers
 
 [![arXiv](https://img.shields.io/badge/arXiv-2611.34929-b31b1b.svg)](https://arxiv.org/abs/2611.34929)
 [![Project Page](https://img.shields.io/badge/Project-Page-blue.svg)](https://white-yc.github.io/pixelmatte/)
